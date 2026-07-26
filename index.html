@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For You</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            background: #000000;
+            overflow: hidden;
+            font-family: 'Press Start 2P', monospace;
+        }
+
+        /* Minimalist Star Container */
+        #stars-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .pixel-star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background-color: #f2f2f2;
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: flicker 3s ease-in-out infinite;
+        }
+
+        @keyframes flicker {
+            0%, 100% { opacity: 0.1; }
+            50% { opacity: 0.8; }
+        }
+
+        /* Smooth Pixel Shooting Stars Layer */
+        #shooting-stars-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .shooting-star {
+            position: absolute;
+            width: 120px;
+            height: 2px;
+            background: linear-gradient(90deg, rgba(255,255,255,1), rgba(255,255,255,0));
+            transform: rotate(-30deg);
+            opacity: 0;
+            image-rendering: pixelated;
+            animation: smoothShoot 2.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        @keyframes smoothShoot {
+            0% { transform: translate(0, 0) rotate(-30deg); opacity: 1; }
+            100% { transform: translate(-600px, 450px) rotate(-30deg); opacity: 0; }
+        }
+
+        /* ---------- Screens ---------- */
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 5;
+            width: 100%;
+            height: 100%;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.9s ease;
+        }
+
+        .screen.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        /* ---------- Buttons with Enhanced Interactive Animations ---------- */
+        .pixel-box {
+            background-color: rgba(5, 5, 5, 0.85);
+            border: 3px solid #e6e6e6;
+            outline: 1px solid #3a3a3a;
+            outline-offset: 4px;
+            color: #e6e6e6;
+            padding: 22px 44px;
+            cursor: pointer;
+            text-align: center;
+            box-shadow: 4px 4px 0px #2a2a2a, 0 0 20px rgba(255, 255, 255, 0.15);
+            letter-spacing: 2px;
+            transition: transform 0.15s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .pixel-box:hover {
+            background-color: #1a1a1a;
+            border-color: #ffffff;
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 6px 6px 0px #3a3a3a, 0 0 30px rgba(255, 255, 255, 0.35);
+        }
+
+        .pixel-box:active {
+            transform: translateY(2px) scale(0.98);
+            box-shadow: 2px 2px 0px #1a1a1a, 0 0 10px rgba(255, 255, 255, 0.2);
+        }
+
+        .pixel-box.small {
+            padding: 14px 28px;
+            font-size: 0.85em;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 4px 4px 0px #2a2a2a, 0 0 15px rgba(255, 255, 255, 0.1); }
+            50% { box-shadow: 4px 4px 0px #2a2a2a, 0 0 28px rgba(255, 255, 255, 0.3); }
+        }
+
+        .pulse-glow {
+            animation: pulseGlow 3s ease-in-out infinite;
+        }
+
+        /* ---------- wsp screen ---------- */
+        .wsp-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 36px;
+        }
+
+        .wsp-text {
+            color: #e6e6e6;
+            font-size: 1.1em;
+            letter-spacing: 2px;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .wsp-buttons {
+            display: flex;
+            gap: 24px;
+        }
+
+        /* ---------- Black transition overlay ---------- */
+        #black-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000000;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 20;
+            transition: opacity 0.9s ease;
+        }
+
+        #black-overlay.visible {
+            opacity: 1;
+        }
+
+        /* ---------- Particle burst layer ---------- */
+        #particle-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 25;
+        }
+
+        .burst-particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background-color: #f2f2f2;
+            border-radius: 50%;
+            box-shadow: 0 0 6px 2px rgba(255, 255, 255, 0.6);
+        }
+
+        .burst-particle.scatter-out {
+            animation: scatterOut 1s ease-out forwards;
+        }
+
+        .burst-particle.scatter-in {
+            animation: scatterIn 1s ease-out forwards;
+        }
+
+        @keyframes scatterOut {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+        }
+
+        @keyframes scatterIn {
+            0% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+            100% { transform: translate(0, 0) scale(1); opacity: 1; }
+        }
+
+        /* ---------- Final screen Layout ---------- */
+        #final-screen {
+            background: #000000;
+            overflow: hidden;
+            flex-direction: column;
+        }
+
+        .cat-scene-wrapper {
+            position: absolute;
+            top: 55%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 35px;
+            z-index: 6;
+            width: 90%;
+            max-width: 600px;
+        }
+
+        /* Message styling above cat */
+        .final-message {
+            text-align: center;
+            opacity: 0;
+            transition: opacity 1.4s ease, transform 1.4s ease;
+            transform: translateY(15px);
+        }
+
+        .final-message.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .final-message p {
+            color: #f5f5f5;
+            font-size: 0.8em;
+            line-height: 2.2;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.6), 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .final-message .signature {
+            display: block;
+            margin-top: 14px;
+            font-size: 0.55em;
+            color: #d0d0d0;
+            letter-spacing: 2px;
+        }
+
+        /* Pixel Cat Container with Clean Neon Glow */
+        .pixel-cat-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.4));
+        }
+
+        .cat-canvas {
+            width: 200px;
+            height: 130px;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            animation: catBreath 3.5s ease-in-out infinite;
+        }
+
+        @keyframes catBreath {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.04); }
+        }
+
+        /* Floating Zzz animations */
+        .zzzz-container {
+            position: absolute;
+            top: -20px;
+            right: 20px;
+            pointer-events: none;
+        }
+
+        .z-letter {
+            position: absolute;
+            color: #ffffff;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 11px;
+            opacity: 0;
+            text-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
+            animation: floatZ 3s linear infinite;
+        }
+
+        .z-letter.z1 { font-size: 9px; animation-delay: 0s; }
+        .z-letter.z2 { font-size: 11px; animation-delay: 1s; }
+        .z-letter.z3 { font-size: 14px; animation-delay: 2s; }
+
+        @keyframes floatZ {
+            0% { transform: translate(0, 0) scale(0.6); opacity: 0; }
+            25% { opacity: 0.9; }
+            100% { transform: translate(30px, -45px) scale(1.2); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background Elements -->
+    <div id="stars-container"></div>
+    <div id="shooting-stars-container"></div>
+    <div id="black-overlay"></div>
+    <div id="particle-container"></div>
+
+    <!-- Landing Screen -->
+    <div id="landing-screen" class="screen active">
+        <div class="pixel-box pulse-glow" id="start-btn"><span>START</span></div>
+    </div>
+
+    <!-- Question Screen -->
+    <div id="wsp-screen" class="screen">
+        <div class="wsp-content">
+            <p class="wsp-text">"Do you truly understand how much you're cherished?"</p>
+            <div class="wsp-buttons">
+                <div class="pixel-box small pulse-glow" id="yes-btn"><span>YES</span></div>
+                <div class="pixel-box small pulse-glow" id="no-btn"><span>NO</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Final Screen -->
+    <div id="final-screen" class="screen">
+        <div class="cat-scene-wrapper">
+            <div class="final-message" id="final-message">
+                <p>Out of all the paths in this world, I'm endlessly grateful yours crossed mine.<br>I love that you're here with me.</p>
+            </div>
+            <div class="pixel-cat-container">
+                <canvas id="cat-canvas" class="cat-canvas" width="200" height="130"></canvas>
+                <div class="zzzz-container">
+                    <span class="z-letter z1">Z</span>
+                    <span class="z-letter z2">z</span>
+                    <span class="z-letter z3">Z</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const clickSound = new Audio('https://cdn.jsdelivr.net/gh/Chillexx/sfx/mixkit-sci-fi-click-900.wav');
+        const bgMusic = new Audio('https://cdn.jsdelivr.net/gh/Chillexx/sfx/silentvoice-crystal-ambient-piano-252638.mp3');
+        bgMusic.loop = true;
+        bgMusic.volume = 0.5;
+
+        clickSound.preload = 'auto';
+        bgMusic.preload = 'auto';
+
+        function playClick() {
+            clickSound.currentTime = 0;
+            clickSound.play().catch(err => console.log('Click sound blocked:', err));
+        }
+
+        function startBgMusic() {
+            bgMusic.play().catch(err => console.log('Browser blocked background music:', err));
+        }
+
+        // Minimalist Background Stars
+        const starsContainer = document.getElementById('stars-container');
+
+        function spawnStars() {
+            if (!starsContainer) return;
+            const fragment = document.createDocumentFragment();
+            for (let i = 0; i < 30; i++) {
+                const star = document.createElement('div');
+                star.classList.add('pixel-star');
+                star.style.left = Math.random() * 100 + 'vw';
+                star.style.top = Math.random() * 100 + 'vh';
+                star.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                star.style.animationDelay = (Math.random() * 3) + 's';
+                fragment.appendChild(star);
+            }
+            starsContainer.appendChild(fragment);
+        }
+
+        spawnStars();
+
+        // Screen Transitions & Logic
+        const screens = {
+            landing: document.getElementById('landing-screen'),
+            wsp: document.getElementById('wsp-screen'),
+            final: document.getElementById('final-screen'),
+        };
+
+        const startBtn = document.getElementById('start-btn');
+        const yesBtn = document.getElementById('yes-btn');
+        const noBtn = document.getElementById('no-btn');
+        const blackOverlay = document.getElementById('black-overlay');
+        const particleContainer = document.getElementById('particle-container');
+
+        let isTransitioning = false;
+        function guarded(ms, handler) {
+            return (e) => {
+                if (isTransitioning) return;
+                isTransitioning = true;
+                setTimeout(() => { isTransitioning = false; }, ms);
+                handler(e);
+            };
+        }
+
+        function spawnParticles(centerX, centerY, mode, count = 45) {
+            if (!particleContainer) return;
+            const fragment = document.createDocumentFragment();
+            for (let i = 0; i < count; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('burst-particle', mode);
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 120 + Math.random() * 260;
+                particle.style.left = centerX + 'px';
+                particle.style.top = centerY + 'px';
+                particle.style.setProperty('--tx', Math.cos(angle) * distance + 'px');
+                particle.style.setProperty('--ty', Math.sin(angle) * distance + 'px');
+                fragment.appendChild(particle);
+                setTimeout(() => particle.remove(), 1300);
+            }
+            particleContainer.appendChild(fragment);
+        }
+
+        function getCenter(el) {
+            const rect = el.getBoundingClientRect();
+            return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+        }
+
+        function eraseAndAdvance(btnEl, currentScreen, nextScreen) {
+            const center = getCenter(btnEl);
+            btnEl.classList.add('erasing');
+            spawnParticles(center.x, center.y, 'scatter-out');
+            if (blackOverlay) setTimeout(() => blackOverlay.classList.add('visible'), 400);
+            setTimeout(() => {
+                if (currentScreen) currentScreen.classList.remove('active');
+                if (nextScreen) nextScreen.classList.add('active');
+            }, 1300);
+            if (blackOverlay) setTimeout(() => blackOverlay.classList.remove('visible'), 1500);
+        }
+
+        function rewindToScreen(currentScreen, targetScreen, targetBtnEl) {
+            targetBtnEl.classList.remove('erasing');
+            targetBtnEl.classList.add('entering');
+            if (blackOverlay) blackOverlay.classList.add('visible');
+            setTimeout(() => {
+                if (currentScreen) currentScreen.classList.remove('active');
+                if (targetScreen) targetScreen.classList.add('active');
+            }, 900);
+            if (blackOverlay) setTimeout(() => blackOverlay.classList.remove('visible'), 1000);
+            setTimeout(() => {
+                const center = getCenter(targetBtnEl);
+                spawnParticles(center.x, center.y, 'scatter-in');
+                targetBtnEl.classList.add('entering');
+            }, 1050);
+        }
+
+        if (startBtn) {
+            startBtn.addEventListener('click', guarded(1600, () => {
+                playClick();
+                startBgMusic();
+                eraseAndAdvance(startBtn, screens.landing, screens.wsp);
+            }));
+        }
+
+        if (noBtn) {
+            noBtn.addEventListener('click', guarded(1200, () => {
+                playClick();
+                rewindToScreen(screens.wsp, screens.landing, startBtn);
+            }));
+        }
+
+        if (yesBtn) {
+            yesBtn.addEventListener('click', guarded(1600, () => {
+                playClick();
+                eraseAndAdvance(yesBtn, screens.wsp, screens.final);
+                setTimeout(() => {
+                    const finalMsg = document.getElementById('final-message');
+                    if (finalMsg) finalMsg.classList.add('show');
+                }, 2200);
+            }));
+        }
+
+        // Detailed Sleeping Pixel Cat Drawing
+        function drawDetailedSleepingCat() {
+            const canvas = document.getElementById('cat-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.imageSmoothingEnabled = false;
+
+            const w = canvas.width;
+            const h = canvas.height;
+            ctx.clearRect(0, 0, w, h);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(44, 48, 56, 28);
+            ctx.fillRect(36, 54, 72, 16);
+            ctx.fillRect(28, 60, 16, 10);
+
+            ctx.fillRect(72, 34, 32, 22);
+            ctx.fillRect(66, 42, 10, 14);
+
+            ctx.fillRect(72, 24, 8, 12);
+            ctx.fillRect(92, 24, 8, 12);
+
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(74, 28, 4, 6);
+            ctx.fillRect(94, 28, 4, 6);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(80, 42, 5, 2);
+            ctx.fillRect(91, 42, 5, 2);
+            ctx.fillRect(87, 46, 2, 2);
+        }
+
+        drawDetailedSleepingCat();
+    </script>
+</body>
+</html>
