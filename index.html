@@ -3,80 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>For You</title>
+    <title>Pixel Art Background</title>
     <style>
-        * {
+        html, body {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-        }
-
-        body, html {
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background-color: #080b12;
             font-family: monospace;
         }
 
-        /* Click to Enter Overlay */
-        #overlay {
+        .pixel-background {
+            width: 100%;
+            height: 100vh;
+            background-image: url('https://raw.githubusercontent.com/Chillexx/sfx/main/download%20(12).jfif');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+
+        #firefly-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        #click-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(8, 11, 18, 0.95);
+            background: rgba(0,0,0,0.7);
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 100;
+            color: white;
+            font-family: monospace;
+            font-size: 20px;
+            z-index: 999;
             cursor: pointer;
             transition: opacity 1s ease;
         }
 
-        #overlay h1 {
-            color: #ffffff;
-            font-size: 18px;
-            letter-spacing: 2px;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-            animation: pulse 2s infinite ease-in-out;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 0.4; }
-            50% { opacity: 1; }
-        }
-
-        /* Canvas for background/fireflies */
-        canvas {
-            display: block;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 1;
-        }
-
-        /* Love Message Card with Dim Glow */
         #love-message {
             position: absolute;
-            top: 50%;
+            top: 25%;
             left: 50%;
             transform: translate(-50%, -50%);
             width: 85%;
             max-width: 580px;
             text-align: center;
-            color: #f0f4f8;
+            color: #ffffff;
             font-size: 14px;
             line-height: 1.8;
             z-index: 10;
             opacity: 0;
             transition: opacity 2.5s ease-in-out;
             pointer-events: none;
-            
-            /* Dim Soft Glow Effect */
-            text-shadow: 0 0 8px rgba(255, 255, 255, 0.5), 
-                         0 0 20px rgba(180, 200, 255, 0.25);
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.6),
+                         0 0 20px rgba(180, 200, 255, 0.3);
         }
 
         #love-message p {
@@ -85,110 +78,133 @@
 
         #love-message .poem {
             font-style: italic;
-            opacity: 0.95;
+        }
+
+        #love-message .author {
+            display: block;
+            margin-top: 10px;
+            font-size: 12px;
+            letter-spacing: 1px;
+            opacity: 0.8;
         }
     </style>
 </head>
 <body>
 
-    <!-- Click Overlay for Audio/Experience Start -->
-    <div id="overlay">
-        <h1>[ click anywhere to enter ]</h1>
-    </div>
+    <div class="pixel-background"></div>
 
-    <!-- Background Canvas -->
-    <canvas id="canvas"></canvas>
+    <canvas id="firefly-canvas"></canvas>
 
-    <!-- Love Message -->
     <div id="love-message">
         <p>Remember when you asked that question and hid it behind something else? You don't ever have to hide your storms from me.</p>
         <p class="poem">
-            A garden doesn’t become beautiful just because of sunlight,<br>
+            A garden doesn't become beautiful just because of sunlight,<br>
             it becomes beautiful because it survives the storms, the rain, the wind, and every season that comes its way,<br>
-            and you’re that garden.<br><br>
-            I don’t want to love only the flowers you show me,<br>
-            I want to be there for the roots, the storms, and everything that makes you who you are.
+            and you're that garden.<br>
+            <span class="author">--BY YERESHH</span>
         </p>
     </div>
 
-    <!-- Background Audio (Replace source with your actual audio file link/path) -->
-    <audio id="bg-music" loop>
-        <source src="your-audio-file.mp3" type="audio/mp3">
+    <div id="click-overlay">
+        Click anywhere to enter
+    </div>
+
+    <audio id="bg-audio" loop>
+        <source src="https://raw.githubusercontent.com/Chillexx/sfx/main/Caribbean%20Blue%20x%20Golden%20Brown%20x%20Love%20Story%20-%20Slowed%20&%20Reverb.mp3" type="audio/mp3">
     </audio>
 
     <script>
-        const overlay = document.getElementById('overlay');
-        const bgMusic = document.getElementById('bg-music');
-        const message = document.getElementById('love-message');
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
+        window.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('firefly-canvas');
+            const ctx = canvas.getContext('2d');
 
-        // Resize canvas
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
 
-        // Simple Firefly Particle Effect
-        const particles = [];
-        const particleCount = 35;
+            const fireflies = [];
+            const numFireflies = 35;
 
-        for (let i = 0; i < particleCount; i++) {
-            particles.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                radius: Math.random() * 1.5 + 0.5,
-                color: 'rgba(255, 240, 180, ' + (Math.random() * 0.6 + 0.2) + ')',
-                speedX: (Math.random() - 0.5) * 0.3,
-                speedY: (Math.random() - 0.5) * 0.3,
-                alphaSpeed: Math.random() * 0.02 + 0.005
+            for (let i = 0; i < numFireflies; i++) {
+                fireflies.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 2 + 1,
+                    speedX: (Math.random() - 0.5) * 0.4,
+                    speedY: (Math.random() - 0.5) * 0.4,
+                    alpha: Math.random(),
+                    alphaChange: (Math.random() * 0.02) + 0.005
+                });
+            }
+
+            function animateFireflies() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                fireflies.forEach(f => {
+                    f.x += f.speedX;
+                    f.y += f.speedY;
+
+                    if (f.x < 0) f.x = canvas.width;
+                    if (f.x > canvas.width) f.x = 0;
+                    if (f.y < 0) f.y = canvas.height;
+                    if (f.y > canvas.height) f.y = 0;
+
+                    f.alpha += f.alphaChange;
+                    if (f.alpha <= 0 || f.alpha >= 1) {
+                        f.alphaChange = -f.alphaChange;
+                    }
+
+                    ctx.beginPath();
+                    ctx.arc(f.x, f.y, f.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(255, 255, 255, ${f.alpha})`;
+                    ctx.shadowBlur = 8;
+                    ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
+                    ctx.fill();
+                });
+
+                requestAnimationFrame(animateFireflies);
+            }
+
+            animateFireflies();
+
+            const audio = document.getElementById('bg-audio');
+            const overlay = document.getElementById('click-overlay');
+            const message = document.getElementById('love-message');
+
+            overlay.addEventListener('click', () => {
+                overlay.style.opacity = '0';
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                }, 1000);
+
+                setTimeout(() => {
+                    message.style.opacity = '1';
+                }, 500);
+
+                audio.volume = 0;
+                audio.play().then(() => {
+                    let fadeDuration = 3000;
+                    let steps = 30;
+                    let increment = 1 / steps;
+                    let intervalTime = fadeDuration / steps;
+                    let currentVolume = 0;
+
+                    let fadeAudio = setInterval(() => {
+                        currentVolume += increment;
+                        if (currentVolume >= 1) {
+                            audio.volume = 1;
+                            clearInterval(fadeAudio);
+                        } else {
+                            audio.volume = currentVolume;
+                        }
+                    }, intervalTime);
+                }).catch(error => {
+                    console.log("Playback failed", error);
+                });
             });
-        }
-
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            particles.forEach(p => {
-                p.x += p.speedX;
-                p.y += p.speedY;
-
-                if (p.x < 0) p.x = canvas.width;
-                if (p.x > canvas.width) p.x = 0;
-                if (p.y < 0) p.y = canvas.height;
-                if (p.y > canvas.height) p.y = 0;
-
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                ctx.fillStyle = p.color;
-                ctx.shadowBlur = 10;
-                ctx.shadowColor = '#fffae0';
-                ctx.fill();
-                ctx.closePath();
-            });
-
-            requestAnimationFrame(animate);
-        }
-        animate();
-
-        // Handle Entry
-        overlay.addEventListener('click', () => {
-            // Fade out overlay
-            overlay.style.opacity = '0';
-            setTimeout(() => {
-                overlay.style.display = 'none';
-            }, 1000);
-
-            // Play Music
-            bgMusic.play().catch(error => {
-                console.log("Audio autoplay restricted:", error);
-            });
-
-            // Fade in Love Message
-            setTimeout(() => {
-                message.style.opacity = '1';
-            }, 500);
         });
     </script>
 </body>
