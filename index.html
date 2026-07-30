@@ -14,16 +14,19 @@
             font-family: monospace;
         }
 
-        .pixel-background {
+       .pixel-background {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
             background-image: url('https://raw.githubusercontent.com/Chillexx/sfx/main/download%20(12).jfif');
-            background-size: cover;
+            
+            /* CHANGES HERE: Use 'contain' so it never stretches or distorts */
+            background-size: contain;
             background-position: center;
             background-repeat: no-repeat;
+            background-color: #080b12; /* Fills empty side bars neatly */
 
             /* Forces crisp pixel rendering */
             image-rendering: -moz-crisp-edges;
