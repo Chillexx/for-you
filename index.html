@@ -1,226 +1,603 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Autumn</title>
-    <style>
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden; /* Prevents scrollbars */
-            font-family: monospace;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GIRLFRIEND_DAY.EXE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFE3EF;
+  --bg2:#E7D4FF;
+  --ink:#2B1830;
+  --pink:#FF6FA5;
+  --pink-light:#FFB6D9;
+  --purple:#9B7BFF;
+  --gold:#FFD666;
+  --white:#FFFFFF;
+  --px: 4px; /* base pixel unit for sprites */
+}
 
-       .pixel-background {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-image: url('https://raw.githubusercontent.com/Chillexx/sfx/main/download%20(12).jfif');
-            
-            /* CHANGES HERE: Use 'contain' so it never stretches or distorts */
-            background-size: contain;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-color: #080b12; /* Fills empty side bars neatly */
+*{ box-sizing:border-box; image-rendering:pixelated; }
 
-            /* Forces crisp pixel rendering */
-            image-rendering: -moz-crisp-edges;
-            image-rendering: -webkit-optimize-contrast;
-            image-rendering: pixelated;
-            image-rendering: crisp-edges;
-        }
+html{ scroll-behavior:smooth; }
 
-        /* Position the firefly canvas on top of the background */
-        #firefly-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none; /* Lets clicks pass right through to the overlay */
-            z-index: 2;
-        }
+body{
+  margin:0;
+  background:
+    repeating-linear-gradient(45deg, var(--bg2) 0 2px, transparent 2px 40px),
+    var(--bg);
+  color:var(--ink);
+  font-family:'VT323', monospace;
+  font-size:1.35rem;
+  overflow-x:hidden;
+  position:relative;
+}
 
-        /* Click Overlay */
-        #click-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            font-family: monospace;
-            font-size: 20px;
-            z-index: 999;
-            cursor: pointer;
-            transition: opacity 1s ease;
-        }
+h1, h2, .pixel-btn, .card-label, .hero-sub, .frame-tag{
+  font-family:'Press Start 2P', 'VT323', monospace;
+}
 
-        /* Love Message Card with Dim Glow Effect */
-        #love-message {
-            position: absolute;
-            top: 25%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 85%;
-            max-width: 580px;
-            text-align: center;
-            color: #ffffff;
-            font-size: 14px;
-            line-height: 1.8;
-            z-index: 10;
-            opacity: 0;
-            transition: opacity 2.5s ease-in-out;
-            pointer-events: none;
+/* ---------- CRT scanline overlay ---------- */
+.scanlines{
+  position:fixed;
+  inset:0;
+  z-index:40;
+  pointer-events:none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(43,24,48,0.06) 0px,
+    rgba(43,24,48,0.06) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
 
-            /* Dim Soft Glow Effect */
-            text-shadow: 0 0 8px rgba(255, 255, 255, 0.6),
-                         0 0 20px rgba(180, 200, 255, 0.3);
-        }
+/* ---------- pixel-art heart sprite (box-shadow technique) ---------- */
+.pixel-heart{
+  --pc: var(--pink);
+  position:relative;
+  width:var(--px);
+  height:var(--px);
+  background:transparent;
+  box-shadow:
+    4px 0px var(--pc), 8px 0px var(--pc), 20px 0px var(--pc), 24px 0px var(--pc),
+    0px 4px var(--pc), 4px 4px var(--pc), 8px 4px var(--pc), 12px 4px var(--pc),
+    16px 4px var(--pc), 20px 4px var(--pc), 24px 4px var(--pc), 28px 4px var(--pc),
+    0px 8px var(--pc), 4px 8px var(--pc), 8px 8px var(--pc), 12px 8px var(--pc),
+    16px 8px var(--pc), 20px 8px var(--pc), 24px 8px var(--pc), 28px 8px var(--pc),
+    0px 12px var(--pc), 4px 12px var(--pc), 8px 12px var(--pc), 12px 12px var(--pc),
+    16px 12px var(--pc), 20px 12px var(--pc), 24px 12px var(--pc), 28px 12px var(--pc),
+    4px 16px var(--pc), 8px 16px var(--pc), 12px 16px var(--pc), 16px 16px var(--pc),
+    20px 16px var(--pc), 24px 16px var(--pc),
+    8px 20px var(--pc), 12px 20px var(--pc), 16px 20px var(--pc), 20px 20px var(--pc),
+    12px 24px var(--pc), 16px 24px var(--pc);
+  margin:0 auto;
+}
+.pixel-heart.big{ transform:scale(2.4); margin-bottom:2.5rem; }
+.pixel-heart.small{ transform:scale(1); }
+.pixel-heart.pulse{ animation: pulse 1.1s steps(2) infinite; }
+@keyframes pulse{
+  50%{ transform:scale(1.15); }
+}
 
-        #love-message p {
-            margin-bottom: 15px;
-        }
+/* bigger, centered heart inside the power-up button */
+.surprise-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+}
+.surprise-btn .pixel-heart.small{
+  transform: scale(1.1) translate(-14px, -12px);
+}
+.surprise-btn .pixel-heart.small.pulse{
+  animation: pulse 1.1s steps(2) infinite;
+  transform-origin:center;
+}
 
-        #love-message .poem {
-            font-style: italic;
-        }
+/* ---------- pixel-art star sprite ---------- */
+.pixel-star{
+  --pc: var(--gold);
+  position:relative;
+  width:var(--px);
+  height:var(--px);
+  background:transparent;
+  box-shadow:
+    8px 0px var(--pc),
+    4px 4px var(--pc), 8px 4px var(--pc), 12px 4px var(--pc),
+    0px 8px var(--pc), 4px 8px var(--pc), 8px 8px var(--pc), 12px 8px var(--pc), 16px 8px var(--pc),
+    4px 12px var(--pc), 8px 12px var(--pc), 12px 12px var(--pc),
+    8px 16px var(--pc);
+}
 
-        #love-message .author {
-            display: block;
-            margin-top: 10px;
-            font-size: 12px;
-            letter-spacing: 1px;
-            opacity: 0.8;
-        }
-    </style>
+/* ---------- floating sprites ---------- */
+.floaties{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:1;
+  overflow:hidden;
+}
+.floaty{
+  position:absolute;
+  bottom:-10%;
+  animation-name:rise;
+  animation-timing-function:linear;
+  animation-fill-mode:forwards;
+}
+@keyframes rise{
+  0%{ transform:translateY(0); opacity:0; }
+  10%{ opacity:0.9; }
+  100%{ transform:translateY(-115vh); opacity:0; }
+}
+
+/* cursor trail */
+.pixel-trail{
+  position:fixed;
+  pointer-events:none;
+  z-index:9999;
+  animation: fadeOut 0.7s steps(3) forwards;
+}
+@keyframes fadeOut{
+  to{ opacity:0; transform: translateY(8px); }
+}
+
+/* ---------- pixel button (chunky stepped border) ---------- */
+.pixel-btn{
+  background:var(--white);
+  color:var(--ink);
+  border:none;
+  padding:14px 20px;
+  font-size:0.75rem;
+  cursor:pointer;
+  position:relative;
+  box-shadow:
+    4px 0 0 var(--ink), -4px 0 0 var(--ink),
+    0 4px 0 var(--ink), 0 -4px 0 var(--ink),
+    4px 4px 0 var(--ink), -4px -4px 0 var(--ink),
+    4px -4px 0 var(--ink), -4px 4px 0 var(--ink),
+    8px 8px 0 rgba(43,24,48,0.35);
+  transition: transform 0.08s steps(1);
+}
+.pixel-btn:hover{ background:var(--pink-light); }
+.pixel-btn:active{
+  transform: translate(4px,4px);
+  box-shadow:
+    4px 0 0 var(--ink), -4px 0 0 var(--ink),
+    0 4px 0 var(--ink), 0 -4px 0 var(--ink),
+    4px 4px 0 var(--ink), -4px -4px 0 var(--ink),
+    4px -4px 0 var(--ink), -4px 4px 0 var(--ink);
+}
+.pixel-btn:focus-visible{ outline:3px dashed var(--purple); outline-offset:6px; }
+
+/* ---------- hero ---------- */
+.hero{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:2rem;
+  position:relative;
+  z-index:2;
+}
+.hero-title{
+  font-size:clamp(1.6rem, 6vw, 3rem);
+  line-height:1.5;
+  color:var(--ink);
+  text-shadow: 4px 4px 0 var(--pink-light);
+  margin:0 0 1.5rem;
+  letter-spacing:1px;
+}
+.hero-sub{
+  font-size:0.7rem;
+  letter-spacing:1px;
+  margin-bottom:2.5rem;
+  color:var(--purple);
+}
+.blink-name{ animation: blink 1s steps(1) infinite; }
+@keyframes blink{ 50%{ opacity:0.2; } }
+
+.start-btn{ font-size:0.85rem; padding:18px 28px; }
+
+.hero-footer{
+  margin-top:3rem;
+  font-size:0.9rem;
+  opacity:0.55;
+}
+
+/* ---------- shared section styling ---------- */
+section{ position:relative; z-index:2; padding:5rem 1.5rem; }
+h2{
+  font-size:clamp(1rem, 3vw, 1.5rem);
+  text-align:center;
+  margin:0.75rem 0 1.5rem;
+  color:var(--ink);
+}
+.card-label{
+  display:inline-block;
+  background:var(--ink);
+  color:var(--gold);
+  font-size:0.6rem;
+  padding:6px 10px;
+  letter-spacing:1px;
+}
+.card-label.center{ display:block; text-align:center; width:fit-content; margin:0 auto; }
+
+/* ---------- letter / quest log ---------- */
+.letter-section{ display:flex; justify-content:center; }
+.letter-card{
+  background:var(--white);
+  padding:2.5rem;
+  max-width:560px;
+  text-align:center;
+  border:4px solid var(--ink);
+  box-shadow: 8px 8px 0 var(--purple);
+}
+.letter-text{
+  font-size:1.35rem;
+  line-height:1.6;
+  color:var(--ink);
+  display:inline;
+}
+.cursor-blink{
+  animation: blink 0.8s steps(1) infinite;
+  color:var(--pink);
+}
+.signoff{
+  font-family:'Press Start 2P', monospace;
+  font-size:0.65rem;
+  color:var(--pink);
+  margin-top:2rem;
+}
+
+/* ---------- gallery / achievements ---------- */
+.gallery-section{ text-align:center; }
+.gallery-hint{
+  color:var(--ink);
+  opacity:0.65;
+  font-size:1.1rem;
+  margin-bottom:2rem;
+}
+.gallery-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+  gap:1.75rem;
+  max-width:800px;
+  margin:0 auto;
+}
+.frame{
+  background:var(--white);
+  padding:8px;
+  border:4px solid var(--ink);
+  box-shadow: 6px 6px 0 var(--pink);
+  transition: transform 0.1s steps(1);
+}
+.frame:hover{ transform: translate(-3px,-3px); box-shadow: 9px 9px 0 var(--pink); }
+.frame img{
+  width:100%;
+  aspect-ratio:1/1;
+  object-fit:cover;
+  display:block;
+}
+.frame-text{
+  width:100%;
+  aspect-ratio:1/1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  text-align:center;
+  padding:16px;
+  background:var(--bg2);
+  color:var(--ink);
+  font-size:0.85rem;
+  line-height:1.5;
+  overflow:auto;
+}
+.frame-text p{
+  margin:0;
+  font-style:italic;
+}
+.frame-tag{
+  display:block;
+  margin-top:8px;
+  font-size:0.55rem;
+  color:var(--purple);
+}
+
+/* ---------- bonus round ---------- */
+.surprise-section{ text-align:center; padding-bottom:6rem; }
+.surprise-btn{ padding:22px; }
+.surprise-text{
+  margin-top:1.75rem;
+  font-family:'Press Start 2P', monospace;
+  font-size:0.7rem;
+  color:var(--pink);
+  min-height:2.5rem;
+  line-height:1.6;
+}
+
+/* ---------- footer ---------- */
+.footer{
+  text-align:center;
+  padding:2rem;
+  font-size:0.9rem;
+  color:var(--ink);
+  opacity:0.55;
+  position:relative;
+  z-index:2;
+}
+
+/* ---------- reveal on scroll ---------- */
+.reveal{
+  opacity:0;
+  transform:translateY(24px);
+  transition: opacity 0.5s steps(6), transform 0.5s steps(6);
+}
+.reveal.in-view{
+  opacity:1;
+  transform:translateY(0);
+}
+
+/* ---------- reduced motion ---------- */
+@media (prefers-reduced-motion: reduce){
+  *{ animation:none !important; transition:none !important; }
+  html{ scroll-behavior:auto; }
+}
+
+/* ---------- mobile ---------- */
+@media (max-width:480px){
+  body{ font-size:1.15rem; }
+  .letter-card{ padding:1.75rem 1.25rem; }
+  .pixel-heart.big{ transform:scale(1.7); }
+}
+</style>
 </head>
 <body>
-
-    <div class="pixel-background"></div>
-
-    <canvas id="firefly-canvas"></canvas>
-
-    <div id="love-message">
-        <p>Remember when you asked that question and hid it behind something else? You don't ever have to hide your storms from me.</p>
-        <p class="poem">
-            A garden doesn't become beautiful just because of sunlight,<br>
-            it becomes beautiful because it survives the storms, the rain, the wind, and every season that comes its way,<br>
-            and you're that garden.<br>
-            <span class="author">--BY YERESHH</span>
-        </p>
+  <!-- scanline overlay -->
+  <div class="scanlines" aria-hidden="true"></div>
+  <!-- floating pixel sprites live here, injected by script -->
+  <div class="floaties" id="floaties" aria-hidden="true"></div>
+  <!-- music: autoplays on first tap/click with a fade-in, then loops -->
+  <audio id="bgMusic" loop preload="auto">
+    <source src="https://raw.githubusercontent.com/Chillexx/sfx/main/Kim%20-%20Confidence%20%28slowed%20%2B%20best%20part%20looped%29.mp3" type="audio/mpeg">
+  </audio>
+  <!-- HERO / TITLE SCREEN -->
+  <section class="hero">
+   
+    <h1 class="hero-title">GIRLFRIEND<br>DAY</h1>
+    <p class="hero-sub">GUGU GAGA <span class="blink-name">[AUTUMN]</span></p>
+    <button class="pixel-btn start-btn" id="scrollCue">PRESS START ▶</button>
+    <p class="hero-footer"> &nbsp;&nbsp; LOVE U AUTUMN</p>
+  </section>
+  <!-- LETTER / QUEST LOG -->
+  <section class="letter-section" id="letterSection">
+    <div class="letter-card reveal">
+      <div class="card-label">QUEST LOG</div>
+      <h2>A NOTE FOR YOU</h2>
+      <p class="letter-text" id="letterText" data-full="i lowkey dont even believe in these typa dates but u wanted me to say this sh so why not  i dont need a specific day to remind me that ur my girl or to tell u how much i love u i genuinely mean that sh from the bottom of my heart its honestly an honour that u came into my life and somehow showed me a whole new side of myself i never even knew was there i love you fr autumn💖
+"></p>
+      <span class="cursor-blink" id="typeCursor">█</span>
+      <p class="signoff">- YERESHH</p>
     </div>
-
-    <div id="click-overlay">
-        Click anywhere to enter
+  </section>
+  <!-- GALLERY / ACHIEVEMENTS -->
+  <section class="gallery-section reveal">
+    <div class="card-label center">ACHIEVEMENTS UNLOCKED</div>
+    <h2>OUR MOMENTS</h2>
+    <div class="gallery-grid">
+      <div class="frame">
+        <div class="frame-text">
+          <span class="pixel-heart small"></span>
+          <p>the day we had our first debate about god isnt it funny how ur an atheist but we met and ended up talking for hours about something u dont even believe in our first ever chismis really had to be about god
+</p>
+        </div>
+        <span class="frame-tag">MEMORY 001</span>
+      </div>
+      <div class="frame">
+        <div class="frame-text">
+          <span class="pixel-heart small"></span>
+          <p>our second debate about feminism and all that sh where i kept annoying ur ass cause i was somehow mixing two completely different arguments together🥀 idk how i even managed to make that sh more confusing than it already was
+</p>
+        </div>
+        <span class="frame-tag">MEMORY 002</span>
+      </div>
+      <div class="frame">
+        <div class="frame-text">
+          <span class="pixel-heart small"></span>
+          <p>when i saw those long ass paras u wrote about me and how u genuinely feel about me i lowkey loved every single one of em ngl it hits different when someone actually takes the time to put all those feelings into words especially when its about me i might not always know how to respond to that sh but trust me i read that shit more than once
+</p>
+        </div>
+        <span class="frame-tag">MEMORY 003</span>
+      </div>
+      <div class="frame">
+        <div class="frame-text">
+          <span class="pixel-heart small"></span>
+          <p>when i kept annoying ur ass and wouldnt give u a straight answer about how i actually felt about our relationship i was making u overthink all that sh while i was just sitting there knowing exactly what i felt but somehow still couldnt say it properly looking back at it now i was lowkey making that sh way harder than it had to be
+</p>
+        </div>
+        <span class="frame-tag">MEMORY 004</span>
+      </div>
+      <div class="frame">
+        <div class="frame-text">
+          <span class="pixel-heart small"></span>
+          <p>when i finally confessed what i truly felt about u and here we are now its crazy how one small moment can change so much sh what if i never joined u that day cause of my ego or what if u never talked to me there are so many small things that couldve gone differently and we probably wouldve never ended up here but somehow everything lined up the way it did so yeah gg us
+</p>
+        </div>
+        <span class="frame-tag">MEMORY 005</span>
+      </div>
+      <div class="frame">
+        <div class="frame-text">
+          <span class="pixel-heart small"></span>
+          <p>the way u talk with me fr even when we just talkin about random ass sh over text it still feels different with u somehow u make even the most boring ass convos feel like something ragebaiting and i dont think ill ever get tired of hearing what u gotta say or maybe i will get bored who knows🥀
+</p>
+        </div>
+        <span class="frame-tag">MEMORY 006</span>
+      </div>
     </div>
+  </section>
+  <!-- BONUS ROUND -->
+  <section class="surprise-section reveal">
+    <div class="card-label center">BONUS ROUND</div>
+    <h2>TAP FOR A POWER-UP</h2>
+    <button id="surpriseBtn" class="pixel-btn surprise-btn">
+      <span class="pixel-heart small"></span>
+    </button>
+    <p id="surpriseText" class="surprise-text">PRESS THE HEART</p>
+  </section>
+  <footer class="footer">
+    GAME OVER? NEVER &nbsp;[VERSION <span id="year"></span>]
+  </footer>
 
-    <audio id="bg-audio" loop>
-        <source src="https://raw.githubusercontent.com/Chillexx/sfx/main/Caribbean%20Blue%20x%20Golden%20Brown%20x%20Love%20Story%20-%20Slowed%20&%20Reverb.mp3" type="audio/mp3">
-    </audio>
+<script>
+// ---------- year ----------
+document.getElementById('year').textContent = new Date().getFullYear();
 
-    <script>
-        window.addEventListener('DOMContentLoaded', () => {
-            const canvas = document.getElementById('firefly-canvas');
-            const ctx = canvas.getContext('2d');
+// ---------- music: fade in on first interaction, then loop ----------
+const bgMusic = document.getElementById('bgMusic');
+const TARGET_VOLUME = 0.6;   // final loudness, 0 to 1
+const FADE_STEP = 0.02;      // volume increase per tick
+const FADE_TICK_MS = 120;    // ms between ticks (~3.6s full fade at these settings)
 
-            function resizeCanvas() {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            }
-            resizeCanvas();
-            window.addEventListener('resize', resizeCanvas);
+bgMusic.volume = 0;
 
-            const fireflies = [];
-            const numFireflies = 35;
+function startMusicWithFade() {
+  bgMusic.play().then(() => {
+    let vol = 0;
+    const fade = setInterval(() => {
+      vol = Math.min(TARGET_VOLUME, vol + FADE_STEP);
+      bgMusic.volume = vol;
+      if (vol >= TARGET_VOLUME) clearInterval(fade);
+    }, FADE_TICK_MS);
+  }).catch(() => {
+    // browser blocked playback; will retry on next interaction
+  });
+}
 
-            for (let i = 0; i < numFireflies; i++) {
-                fireflies.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    radius: Math.random() * 2 + 1,
-                    speedX: (Math.random() - 0.5) * 0.4,
-                    speedY: (Math.random() - 0.5) * 0.4,
-                    alpha: Math.random(),
-                    alphaChange: (Math.random() * 0.02) + 0.005
-                });
-            }
+// browsers require a real user gesture before audio can play with sound,
+// so we hook the first click/tap/keypress anywhere on the page
+['click', 'touchstart', 'keydown'].forEach(evt => {
+  document.addEventListener(evt, startMusicWithFade, { once: true });
+});
 
-            function animateFireflies() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
+// ---------- floating pixel sprites (hearts + stars) ----------
+const floatiesContainer = document.getElementById('floaties');
 
-                fireflies.forEach(f => {
-                    f.x += f.speedX;
-                    f.y += f.speedY;
+function spawnFloaty() {
+  const el = document.createElement('div');
+  const isHeart = Math.random() > 0.4;
+  el.className = 'floaty ' + (isHeart ? 'pixel-heart' : 'pixel-star');
 
-                    if (f.x < 0) f.x = canvas.width;
-                    if (f.x > canvas.width) f.x = 0;
-                    if (f.y < 0) f.y = canvas.height;
-                    if (f.y > canvas.height) f.y = 0;
+  const left = Math.random() * 100;
+  const duration = 9 + Math.random() * 8;
+  const scale = 0.5 + Math.random() * 1;
 
-                    f.alpha += f.alphaChange;
-                    if (f.alpha <= 0 || f.alpha >= 1) {
-                        f.alphaChange = -f.alphaChange;
-                    }
+  el.style.left = left + 'vw';
+  el.style.transform = `scale(${scale})`;
+  el.style.animationDuration = duration + 's';
 
-                    ctx.beginPath();
-                    ctx.arc(f.x, f.y, f.radius, 0, Math.PI * 2);
-                    ctx.fillStyle = `rgba(255, 255, 255, ${f.alpha})`;
-                    ctx.shadowBlur = 8;
-                    ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
-                    ctx.fill();
-                });
+  floatiesContainer.appendChild(el);
+  setTimeout(() => el.remove(), duration * 1000);
+}
 
-                requestAnimationFrame(animateFireflies);
-            }
+setInterval(spawnFloaty, 1100);
+for (let i = 0; i < 5; i++) setTimeout(spawnFloaty, i * 350);
 
-            animateFireflies();
+// ---------- pixel cursor trail (desktop only, respects reduced motion) ----------
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const isTouchDevice = window.matchMedia('(pointer: coarse)').matches;
 
-            const audio = document.getElementById('bg-audio');
-            const overlay = document.getElementById('click-overlay');
-            const message = document.getElementById('love-message');
+if (!prefersReducedMotion && !isTouchDevice) {
+  let lastTrail = 0;
+  document.addEventListener('mousemove', (e) => {
+    const now = Date.now();
+    if (now - lastTrail < 140) return;
+    lastTrail = now;
 
-            overlay.addEventListener('click', () => {
-                overlay.style.opacity = '0';
-                setTimeout(() => {
-                    overlay.style.display = 'none';
-                }, 1000);
+    const dot = document.createElement('div');
+    dot.className = 'pixel-trail pixel-heart small';
+    dot.style.left = e.clientX + 'px';
+    dot.style.top = e.clientY + 'px';
+    dot.style.transform = 'scale(0.6)';
+    document.body.appendChild(dot);
 
-                setTimeout(() => {
-                    message.style.opacity = '1';
-                }, 500);
+    setTimeout(() => dot.remove(), 700);
+  });
+}
 
-                audio.volume = 0;
-                audio.play().then(() => {
-                    let fadeDuration = 3000;
-                    let steps = 30;
-                    let increment = 1 / steps;
-                    let intervalTime = fadeDuration / steps;
-                    let currentVolume = 0;
+// ---------- scroll reveal ----------
+const revealEls = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('in-view');
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.2 });
 
-                    let fadeAudio = setInterval(() => {
-                        currentVolume += increment;
-                        if (currentVolume >= 1) {
-                            audio.volume = 1;
-                            clearInterval(fadeAudio);
-                        } else {
-                            audio.volume = currentVolume;
-                        }
-                    }, intervalTime);
-                }).catch(error => {
-                    console.log("Playback failed", error);
-                });
-            });
-        });
-    </script>
+revealEls.forEach(el => observer.observe(el));
+
+// ---------- scroll cue ----------
+document.getElementById('scrollCue').addEventListener('click', () => {
+  document.getElementById('letterSection').scrollIntoView({ behavior: 'smooth' });
+});
+
+// ---------- typewriter letter (plays once when in view) ----------
+const letterEl = document.getElementById('letterText');
+const cursorEl = document.getElementById('typeCursor');
+const fullText = letterEl.dataset.full;
+let typed = false;
+
+function typeLetter() {
+  if (typed) return;
+  typed = true;
+  let i = 0;
+  const speed = 22;
+  const interval = setInterval(() => {
+    letterEl.textContent = fullText.slice(0, i);
+    i++;
+    if (i > fullText.length) {
+      clearInterval(interval);
+      cursorEl.style.opacity = '1';
+    }
+  }, speed);
+}
+
+const letterObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      typeLetter();
+      letterObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.4 });
+
+letterObserver.observe(document.getElementById('letterSection'));
+
+// ---------- bonus round ----------
+const surpriseMessages = [
+  'GUGU GAGA',
+  'ACHIEVEMENT: YOU ARE NOT LESBIAN ANYMORE YAYAYA',
+  'NEW HIGH SCORE: US',
+  'ITEM GET: OVERTHINKING',
+];
+
+const surpriseBtn = document.getElementById('surpriseBtn');
+const surpriseText = document.getElementById('surpriseText');
+
+surpriseBtn.addEventListener('click', () => {
+  const msg = surpriseMessages[Math.floor(Math.random() * surpriseMessages.length)];
+  surpriseText.textContent = msg;
+
+  for (let i = 0; i < 8; i++) {
+    setTimeout(() => spawnFloaty(), i * 70);
+  }
+});
+</script>
 </body>
 </html>
