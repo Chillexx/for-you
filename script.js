@@ -13,25 +13,25 @@ const NOTES = [
     s: "s0",
     t: `21 June 2026
 
-Oh my my i can never forget this date my love the day we met for the first time You were helping Simon with her stuff and sh and I joined that server to troll creatures LOL see that's why I call you an angel and devil myself LMAOO but still this is lwk surprising af like out of every possible way we could've met we somehow met in Soulmate Color who would've thought that a random game would be where our story started`
+Oh my my I can never forget this date my love the day we met for the first time u were helping Simon with her stuff and sh and I joined that server to troll creatures LOL see that's why I call you an angel and devil myself LMAOO but still this is lwk surprising af like out of every possible way we could've met we somehow met in Soulmate Color who would've thought that a random game would be where our story started`
   },
   {
     s: "s1",
     a: "bad",
     t: `
 
-yk autumn I know how much you love playing badminton nd sh and I genuinely hope you achieve your dream of playing internationally one day and yk what I lwk have this silly little wish of playing badminton with you in a peaceful silent place in a lucid dream LOL just you and me playing for hours nonstop with no worries and nothing else to think about idk gng that sh lwk sounds SO FUN FOR SOME REASON `
+yk autumn I know how much you love playing badminton nd sh and I genuinely hope you achieve your dream of playing internationally one day and yk what I lwk have this silly little wish of playing badminton with you in a peaceful silent place like in a lucid dream type sh just you and me playing for hours nonstop with no worries and nothing else to think about idk gng that sh lwk sounds SO FUN FOR SOME REASON `
   },
   {
     s: "s2",
     a: "orb",
     t: `16 July 2026
 
-OHHH YAYAYAYAY THS DATE OH MY MY IDK HOW LONG WE WERE TALKIN WITH EACH OTHER ON THAT DAY BUT FINALLY OH MY GOD AT THE END AT THE END OF THAT DAY AT NIGHT I TOLD U WHAT I TRULY FEEL ABT U AUTUMN 😭 DAT WAS LWK MA BEST DECISION OF MA LIFE MAN I LOVE YOU SO SO MUCH
+OHHH YAYAYAYAY THS DATE OH MY MY IDK HOW LONG WE WERE TALKIN WITH EACH OTHER ON THAT DAY BUT FINALLY OH MY GOD AT THE END AT THE END OF THAT DAY AT NIGHT I TOLD U WHAT I TRULY FEEL ABT U AUTUMN DAT WAS LWK MA BEST DECISION OF MA LIFE MAN I LOVE YOU SO SO MUCH
 
 yk i sometimes do dat typa sh rowan x autumn or chlorophyll BUT YK WHAT FK THOSE NGAS LMAOO U R MA FINE SHYT ONLY MA SHYT U R MY AUTUMN idc if ths sh sounds obsessed or whatever BUT U R MA AUTUMN ONLY MINEE U R YERESHHH'S AUTUMN YAYAYAYAYAYY
 
-in every life i want u autumn only u i love you so much shaivi ridhhi autumn i love youu soo soo much`
+i every life i want u autumn only u i love you so much shaivi ridhhi autumn i love youu soo soo much `
   },
   {
     s: "s3",
